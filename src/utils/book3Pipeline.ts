@@ -9,7 +9,7 @@
  */
 
 import { Book3Row } from '../types/book3.ts';
-import { loadPointNames, PointNameMap } from '../data/pointNames.ts';
+import { loadPointNames, loadPointStt, PointNameMap } from '../data/pointNames.ts';
 import {
   readFileToSheets, parseD11aSheet, parseHtSheet, pickSheet, SheetData
 } from './book3Parser.ts';
@@ -31,7 +31,8 @@ export interface Book3FromFilesResult {
 export const buildBook3FromSheets = (
   s1: SheetData,
   s2: SheetData,
-  pointNames: PointNameMap = {}
+  pointNames: PointNameMap = {},
+  sttMap: Record<string, number> = {}
 ): Book3FromFilesResult => {
   const b1 = parseD11aSheet(s1.rows);
   const b2 = parseHtSheet(s2.rows);
@@ -55,7 +56,7 @@ export const buildBook3FromSheets = (
     };
   }
 
-  const built = buildBook3Rows(b1.rows, b2.rows, { pointNames });
+  const built = buildBook3Rows(b1.rows, b2.rows, { pointNames, sttMap });
 
   return {
     success: true,
@@ -76,10 +77,11 @@ export const buildBook3FromFiles = async (
   file1: File,
   file2: File
 ): Promise<Book3FromFilesResult> => {
-  const [sheets1, sheets2, pointNames] = await Promise.all([
+  const [sheets1, sheets2, pointNames, sttMap] = await Promise.all([
     readFileToSheets(file1),
     readFileToSheets(file2),
     loadPointNames(),
+    loadPointStt(),
   ]);
   const s1 = pickSheet(sheets1, 'D11A');
   const s2 = pickSheet(sheets2, 'D11A_HT');
@@ -90,7 +92,7 @@ export const buildBook3FromFiles = async (
       message: 'Một trong hai file không có sheet dữ liệu.',
     };
   }
-  return buildBook3FromSheets(s1, s2, pointNames);
+  return buildBook3FromSheets(s1, s2, pointNames, sttMap);
 };
 
 export interface Book3ExportMeta {
@@ -107,7 +109,7 @@ export const exportBook3FromFiles = async (
 ): Promise<Book3FromFilesResult> => {
   const res = await buildBook3FromFiles(file1, file2);
   if (res.success && res.totals) {
-    exportBook3({
+    await exportBook3({
       rows: res.rows,
       totals: res.totals,
       month: res.month,

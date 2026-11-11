@@ -11,7 +11,6 @@
  *   dòng cuối : TỔNG
  */
 
-import * as XLSX from 'xlsx';
 import { Book3Row } from '../types/book3.ts';
 
 export interface Book3ExportOptions {
@@ -23,8 +22,6 @@ export interface Book3ExportOptions {
   agencyName?: string;
   departmentName?: string;
   fileName?: string;
-  /** Trả về workbook thay vì ghi file (dùng cho test). */
-  asWorkbook?: boolean;
 }
 
 const MONEY_FMT = '#,##0';
@@ -106,91 +103,119 @@ export const book3Aoa = (opts: Book3ExportOptions): unknown[][] => {
   return aoa;
 };
 
-export const buildBook3Workbook = (opts: Book3ExportOptions): XLSX.WorkBook => {
-  const { month, year } = opts;
+/**
+ * Dựng workbook bằng ExcelJS (thư viện `xlsx` bản miễn phí KHÔNG ghi được
+ * khung viền, font và cài đặt in — đó là lý do trước đây file xuất ra phải
+ * chỉnh lại trước khi in).
+ *
+ * Cài đặt in đã có sẵn: A4 ngang, vừa 1 trang theo chiều rộng, lặp lại tiêu đề
+ * bảng (dòng 6-10) ở mỗi trang, căn giữa, đánh số trang ở chân trang.
+ */
+const FONT = 'Times New Roman';
+const THIN = { style: 'thin' as const };
+const BORDER = { top: THIN, left: THIN, bottom: THIN, right: THIN };
+
+export const buildBook3Workbook = async (opts: Book3ExportOptions) => {
+  const ExcelJS = (await import('exceljs')).default;
+  const { rows, totals, month, year } = opts;
   const aoa = book3Aoa(opts);
-  const ws = XLSX.utils.aoa_to_sheet(aoa);
-  const wb = XLSX.utils.book_new();
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet(book3SheetTitle(month, year), {
+    views: [{ showGridLines: false, state: 'frozen', xSplit: 3, ySplit: 10 }],
+    pageSetup: {
+      paperSize: 9,
+      orientation: 'landscape',
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      horizontalCentered: true,
+      margins: { left: 0.4, right: 0.4, top: 0.5, bottom: 0.6, header: 0.3, footer: 0.3 },
+      printTitlesRow: '6:10',
+    },
+    headerFooter: { oddFooter: '&C&"Times New Roman,Regular"&10Trang &P / &N' },
+  });
 
-  const totalRowIdx = aoa.length - 1; // 0-based
+  aoa.forEach(r => ws.addRow(r));
 
-  // --- gộp ô đúng như mẫu ---
-  const merges: XLSX.Range[] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } },   // A1:C1 đơn vị
-    { s: { r: 1, c: 0 }, e: { r: 1, c: 2 } },   // A2:C2 bộ phận
-    { s: { r: 3, c: 0 }, e: { r: 3, c: 15 } },  // A4:P4 tiêu đề
-    // tầng 1 gộp dọc
-    { s: { r: 5, c: 0 }, e: { r: 8, c: 0 } },   // A6:A9
-    { s: { r: 5, c: 1 }, e: { r: 8, c: 1 } },   // B6:B9
-    { s: { r: 5, c: 2 }, e: { r: 8, c: 2 } },   // C6:C9
-    { s: { r: 5, c: 3 }, e: { r: 5, c: 5 } },   // D6:F6 Người tham gia
-    { s: { r: 6, c: 3 }, e: { r: 8, c: 3 } },   // D7:D9
-    { s: { r: 6, c: 4 }, e: { r: 8, c: 4 } },   // E7:E9
-    { s: { r: 6, c: 5 }, e: { r: 8, c: 5 } },   // F7:F9
-    { s: { r: 5, c: 6 }, e: { r: 5, c: 8 } },   // G6:I6 Số thu
-    { s: { r: 6, c: 6 }, e: { r: 8, c: 6 } },   // G7:G9
-    { s: { r: 6, c: 7 }, e: { r: 6, c: 8 } },   // H7:I7 Trong đó
-    { s: { r: 7, c: 7 }, e: { r: 8, c: 7 } },   // H8:H9
-    { s: { r: 7, c: 8 }, e: { r: 8, c: 8 } },   // I8:I9
-    { s: { r: 5, c: 9 }, e: { r: 5, c: 12 } },  // J6:M6 Số thoái thu
-    { s: { r: 6, c: 9 }, e: { r: 6, c: 12 } },  // J7:M7
-    { s: { r: 7, c: 9 }, e: { r: 7, c: 10 } },  // J8:K8
-    { s: { r: 5, c: 13 }, e: { r: 5, c: 15 } }, // N6:P6 Số phải chi
-    { s: { r: 6, c: 13 }, e: { r: 8, c: 13 } }, // N7:N9
-    { s: { r: 6, c: 14 }, e: { r: 6, c: 15 } }, // O7:P7
-    { s: { r: 7, c: 14 }, e: { r: 8, c: 14 } }, // O8:O9
-    { s: { r: 7, c: 15 }, e: { r: 8, c: 15 } }, // P8:P9
-    // dòng TỔNG
-    { s: { r: totalRowIdx, c: 0 }, e: { r: totalRowIdx, c: 2 } },
+  const lastDataRow = 10 + rows.length;      // dòng dữ liệu cuối (1-based)
+  const totalRow = aoa.length;               // dòng TỔNG (1-based)
+
+  const merges = [
+    'A1:G1', 'A2:G2', 'A4:P4',
+    'A6:A9', 'B6:B9', 'C6:C9', 'D6:F6', 'D7:D9', 'E7:E9', 'F7:F9',
+    'G6:I6', 'G7:G9', 'H7:I7', 'H8:H9', 'I8:I9',
+    'J6:M6', 'J7:M7', 'J8:K8', 'L8:M8',
+    'N6:P6', 'N7:N9', 'O7:P7', 'O8:O9', 'P8:P9',
+    `A${totalRow}:C${totalRow}`,
   ];
-  ws['!merges'] = merges;
+  merges.forEach(m => ws.mergeCells(m));
 
-  // --- định dạng số ---
-  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
-  for (let r = 10; r <= range.e.r; r++) {
-    for (let c = 3; c <= 15; c++) {
-      const addr = XLSX.utils.encode_cell({ r, c });
-      const cell = ws[addr];
-      if (cell && typeof cell.v === 'number') cell.z = MONEY_FMT;
+  // Tiêu đề đơn vị / báo cáo
+  ws.getCell('A1').font = { name: FONT, size: 12, bold: true };
+  ws.getCell('A2').font = { name: FONT, size: 13, bold: true };
+  ws.getCell('A4').font = { name: FONT, size: 14, bold: true };
+  ws.getCell('A4').alignment = { horizontal: 'center', vertical: 'middle' };
+
+  // Khối tiêu đề bảng (dòng 6-10)
+  for (let r = 6; r <= 10; r++) {
+    for (let c = 1; c <= 16; c++) {
+      const cell = ws.getCell(r, c);
+      cell.font = { name: FONT, size: 11, bold: true, italic: r === 10 };
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      cell.border = BORDER;
     }
   }
 
-  // --- độ rộng cột ---
-  ws['!cols'] = [
-    { wch: 5 },   // A STT
-    { wch: 12 },  // B Mã đơn vị
-    { wch: 34 },  // C Đại lý thu xã
-    { wch: 8 },   // D
-    { wch: 8 },   // E
-    { wch: 8 },   // F
-    { wch: 14 },  // G
-    { wch: 12 },  // H
-    { wch: 14 },  // I
-    { wch: 8 },   // J
-    { wch: 12 },  // K
-    { wch: 8 },   // L
-    { wch: 13 },  // M
-    { wch: 13 },  // N
-    { wch: 12 },  // O
-    { wch: 12 },  // P
-  ];
+  // Dữ liệu + dòng TỔNG
+  for (let r = 11; r <= totalRow; r++) {
+    const isTotal = r === totalRow;
+    for (let c = 1; c <= 16; c++) {
+      const cell = ws.getCell(r, c);
+      cell.border = BORDER;
+      cell.font = { name: FONT, size: 12, bold: isTotal };
+      if (c === 3 && !isTotal) cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+      else if (c <= 2) cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      else cell.alignment = { horizontal: 'right', vertical: 'middle' };
+      if (c >= 4) cell.numFmt = MONEY_FMT;
+    }
+    ws.getRow(r).height = 23.25;
+  }
+  // Dòng TỔNG dùng công thức SUM để sửa tay số liệu thì tổng tự cập nhật
+  if (rows.length > 0) {
+    for (let c = 4; c <= 16; c++) {
+      const col = ws.getColumn(c).letter;
+      ws.getCell(totalRow, c).value = {
+        formula: `SUM(${col}11:${col}${lastDataRow})`,
+        result: Number(aoa[totalRow - 1][c - 1]) || 0,
+      };
+    }
+  }
 
-  (ws as unknown as Record<string, unknown>)['!pageSetup'] = {
-    orientation: 'landscape',
-    paperSize: 9,
-    fitToPage: true,
-    fitToWidth: 1,
-    fitToHeight: 0,
-  };
+  const heights: Record<number, number> = { 1: 22, 2: 22, 3: 8, 4: 26, 5: 8, 6: 42, 7: 28.5, 8: 20, 9: 20, 10: 20 };
+  Object.entries(heights).forEach(([r, h]) => { ws.getRow(Number(r)).height = h; });
 
-  XLSX.utils.book_append_sheet(wb, ws, book3SheetTitle(month, year));
+  [5, 11, 40, 9, 9, 9, 16, 15, 16, 9, 14, 9, 15, 15, 14, 14].forEach((w, i) => {
+    ws.getColumn(i + 1).width = w;
+  });
+
+  // Vùng in: gồm cả dòng TỔNG
+  ws.pageSetup.printArea = `A1:P${totalRow}`;
   return wb;
 };
 
-/** Xuất và tải file (dùng trong trình duyệt) hoặc ghi ra đĩa (Node). */
-export const exportBook3 = (opts: Book3ExportOptions): void => {
-  const wb = buildBook3Workbook(opts);
+/** Xuất và tải file (trình duyệt). */
+export const exportBook3 = async (opts: Book3ExportOptions): Promise<void> => {
+  const wb = await buildBook3Workbook(opts);
   const fileName =
     opts.fileName ?? `TH_HOA_HONG_THANG_${opts.month}_${opts.year}.xlsx`;
-  XLSX.writeFile(wb, fileName);
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
 };
