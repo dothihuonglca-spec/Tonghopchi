@@ -78,7 +78,7 @@ export const StaffDetailModal: React.FC<StaffDetailModalProps> = ({
         <div className="p-6 border-b border-slate-100 bg-blue-50/20">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div className="bg-white p-3 rounded-xl border border-slate-200">
-              <div className="text-slate-500 text-3xs uppercase font-medium">Tổng Doanh Thu Thu Hộ</div>
+              <div className="text-slate-500 text-3xs uppercase font-medium">Tổng số thu của người tham gia</div>
               <div className="text-base font-bold text-slate-900 mt-1">
                 {formatCurrency(staff.totalRevenue)} VNĐ
               </div>
