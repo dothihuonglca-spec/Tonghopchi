@@ -102,7 +102,7 @@ const StatCard: React.FC<StatCardProps> = ({ tone, icon: Icon, label, chip, acti
         <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${t.iconBox}`}>
           <Icon className="w-4 h-4" />
         </span>
-        <span className="text-xs font-semibold text-slate-700 truncate flex-1" title={label}>{label}</span>
+        <span className="text-xs font-semibold text-slate-700 leading-tight line-clamp-2 flex-1" title={label}>{label}</span>
         {active
           ? <CheckCircle2 className={`w-4 h-4 shrink-0 ${t.check}`} aria-label="Đang xem" />
           : <span className={`text-2xs font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${t.chip}`}>{chip}</span>}
@@ -160,58 +160,58 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
 
       <div className="grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7 gap-2.5 items-stretch">
         <StatCard
-          tone="blue" icon={Coins} label="Tổng thù lao thực lĩnh" chip={`TB ${comRatio}%`}
+          tone="blue" icon={Coins} label="Số phải chi thù lao — Tổng số (Book3 cột 11)" chip={`TB ${comRatio}%`}
           active={activeBlockId === 'hoahong'} onClick={() => onSelectBlock('hoahong')}
-          footer={`Đã trừ thù lao thu hồi (${d11aHtCount} dòng)`}
+          footer={`Đã trừ Số thoái thu (${d11aHtCount} dòng D11A_HT)`}
         >
           {formatCurrency(book3Total)} {unit}
         </StatCard>
 
         <StatCard
-          tone="emerald" icon={TrendingUp} label="Tổng doanh thu đóng" chip={`${receiptCount} BL`}
+          tone="emerald" icon={TrendingUp} label="Tổng số thu của người tham gia" chip={`${receiptCount} BL`}
           active={activeBlockId === 'revenue'} onClick={() => onSelectBlock('revenue')}
-          footer={`Thu mới: ${formatCurrency(newRevenue)}`}
+          footer={`Đối tượng thu mới: ${formatCurrency(newRevenue)}`}
         >
           {formatCurrency(totalRevenue)} {unit}
         </StatCard>
 
         <StatCard
-          tone="amber" icon={Sparkles} label={`Thù lao thu mới (${(RATE_NEW * 100).toFixed(1)}%)`} chip={`${avgNewRate}%`}
+          tone="amber" icon={Sparkles} label={`Đối tượng khai thác thu mới — Số tiền phải chi thù lao (${(RATE_NEW * 100).toFixed(1)}%)`} chip={`${avgNewRate}%`}
           active={activeBlockId === 'new_rev'} onClick={() => onSelectBlock('new_rev')}
-          footer={`Doanh thu mới: ${formatCurrency(newRevenue)}`}
+          footer={`Số tiền NTG đóng: ${formatCurrency(newRevenue)}`}
         >
           {formatCurrency(newCommission)} {unit}
         </StatCard>
 
         <StatCard
-          tone="indigo" icon={Repeat} label={`Thu thường kỳ (${(RATE_REG * 100).toFixed(1)}%)`} chip={`${avgRegRate}%`}
+          tone="indigo" icon={Repeat} label={`Đối tượng khai thác thu thường kỳ — Số tiền phải chi thù lao (${(RATE_REG * 100).toFixed(1)}%)`} chip={`${avgRegRate}%`}
           active={activeBlockId === 'reg_rev'} onClick={() => onSelectBlock('reg_rev')}
-          footer={`Doanh thu TK: ${formatCurrency(regRevenue)}`}
+          footer={`Số tiền NTG đóng: ${formatCurrency(regRevenue)}`}
         >
           {formatCurrency(regCommission)} {unit}
         </StatCard>
 
         <StatCard
-          tone="sky" icon={PlusCircle} label="Sheet D11A — trích thù lao phát sinh" chip={`${d11aCount} BL`}
+          tone="sky" icon={PlusCircle} label="D11A — Thù lao tổ chức dịch vụ thu" chip={`${d11aCount} BL`}
           active={activeBlockId === 'd11a'} onClick={() => onSelectBlock('d11a')}
-          footer={`Tiền thu: ${formatCurrency(d11aRevenue)}`}
+          footer={`Tổng số thu của NTG: ${formatCurrency(d11aRevenue)}`}
         >
           +{formatCurrency(d11aCommission)} {unit}
         </StatCard>
 
         <StatCard
-          tone="purple" icon={MinusCircle} label="Sheet D11A_HT — thù lao phải thu hồi" chip={`${d11aHtCount} dòng`}
+          tone="purple" icon={MinusCircle} label="D11A_HT — Số tiền thù lao phải thu hồi" chip={`${d11aHtCount} dòng`}
           active={activeBlockId === 'd11a_ht'} onClick={() => onSelectBlock('d11a_ht')}
-          footer={`Hoàn trả NTG: ${formatCurrency(d11aHtRefund)}`}
+          footer={`Số tiền hoàn trả NTG: ${formatCurrency(d11aHtRefund)}`}
         >
           −{formatCurrency(d11aHtCommission)} {unit}
         </StatCard>
 
         <StatCard
-          tone="slate" icon={Building2} label="Điểm thu & nhân viên thu" chip={`${activePointCount} điểm`}
+          tone="slate" icon={Building2} label="Mã điểm thu — Nhân viên thu" chip={`${activePointCount} điểm`}
           active={activeBlockId === 'scale'} onClick={() => onSelectBlock('scale')}
           className="col-span-2 lg:col-span-2 2xl:col-span-1"
-          footer="Theo dõi chỉ tiêu từng điểm thu"
+          footer="Theo Mã điểm thu và Mã số nhân viên thu"
         >
           {activePointCount} điểm · {activeStaffCount} NV · {receiptCount} BL
         </StatCard>
