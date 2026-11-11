@@ -49,3 +49,18 @@ export const savePointNames = (map: PointNameMap): void => {
 /** Tên hiển thị: có trong danh mục thì dùng, không thì trả về chính mã. */
 export const pointName = (code: string, map: PointNameMap = {}): string =>
   map[code] ?? code;
+
+/**
+ * STT gốc của từng mã điểm thu trong Book3 (ví dụ 1, 2, 3, 14, 46).
+ * Đọc từ `public/point-stt.json`; mã nào chưa có thì builder tự đánh số.
+ */
+export const loadPointStt = async (): Promise<Record<string, number>> => {
+  try {
+    const res = await fetch('/point-stt.json', { cache: 'no-cache' });
+    if (!res.ok) return {};
+    const data = await res.json();
+    return data && typeof data === 'object' ? data : {};
+  } catch {
+    return {};
+  }
+};

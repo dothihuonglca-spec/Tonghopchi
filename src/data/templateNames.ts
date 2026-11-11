@@ -53,6 +53,8 @@ export const D11A_HT = {
 // Book3 — sheet "TH HOA HONG THANG <tháng>-<năm>"
 // ---------------------------------------------------------------------------
 export const BOOK3 = {
+  /** Dòng 2 của mẫu Book3. */
+  department: 'BỘ PHẬN QUẢN LÝ THU & PHÁT TRIỂN NGƯỜI THAM GIA',
   sheetName: (month: number, year: number) => `TH HOA HONG THANG ${month}-${year}`,
   title: (month: number, year: number) =>
     `TỔNG HỢP SỐ PHẢI CHI HOA HỒNG ĐẠI LÝ THU BHYT HỘ GIA ĐÌNH ` +
