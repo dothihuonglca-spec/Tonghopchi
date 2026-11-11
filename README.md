@@ -18,3 +18,4 @@ View your app in AI Studio: https://ai.studio/apps/d4984be7-78c0-41a0-ba6f-f323c
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+# Tonghopchi
