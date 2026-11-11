@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/* Font nét mảnh, tròn trịa (Nunito) + giảm độ đậm của các lớp font-bold/black cho thanh thoát */
+@theme {
+  --font-sans: "Quicksand", "Nunito", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Quicksand", "Nunito", "Segoe UI", system-ui, sans-serif;
+  --font-weight-normal: 500;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 600;
+  --font-weight-extrabold: 700;
+  --font-weight-black: 700;
+}
+
+@layer base {
+  body {
+    font-family: "Quicksand", "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.005em;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer base {
+  /* Số thẳng hàng trong bảng biểu */
+  table, td, th, input, select, textarea, button {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Thanh cuộn mảnh, bo tròn cho bảng rộng */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 transparent;
+  }
+}
+
+@layer utilities {
+  .text-2xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  .text-3xs {
+    font-size: 0.6875rem;
+    line-height: 0.9375rem;
+  }
+}
+
+@media print {
+  header, footer, nav, button, [class*="print:hidden"], #filter-bar, aside {
+    display: none !important;
+  }
+  body, main {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  #printable-hoahong-doc {
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  table {
+    font-size: 9pt !important;
+  }
+  @page {
+    size: A4 landscape;
+    margin: 1cm;
+  }
+}
+
+/* Giao diện mềm: bỏ IN HOA ép buộc và giãn chữ, giúp bớt "nặng" và bớt rối mắt */
+.uppercase { text-transform: none !important; }
+.tracking-wider, .tracking-wide, .tracking-widest { letter-spacing: 0 !important; }

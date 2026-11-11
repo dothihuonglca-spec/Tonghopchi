@@ -1,0 +1,6 @@
+{
+  "name": "Phần Mềm Tổng Hợp & Quản Lý Thù Lao BHXH - D11A",
+  "description": "Hệ thống tự động nhập dữ liệu file Excel/CSV mẫu D11A và D11A_HT, tổng hợp thù lao hoa hồng theo tháng, quý, năm, lưu trữ an toàn trên LocalStorage và xuất báo cáo Excel chuyên nghiệp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
