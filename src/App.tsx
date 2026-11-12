@@ -17,7 +17,7 @@ import { filterAndCalculate } from './utils/calculator.ts';
 import { downloadStandardTemplate } from './utils/excelExport.ts';
 import { exportBook3 } from './utils/book3Export.ts';
 import { buildBook3FromRecords } from './utils/book3FromRecords.ts';
-import { loadPointNames, PointNameMap } from './data/pointNames.ts';
+import { loadPointNames, loadPointStt, PointNameMap } from './data/pointNames.ts';
 import { D11A, D11A_HT, BOOK3 } from './data/templateNames.ts';
 
 // Components
@@ -153,24 +153,27 @@ export default function App() {
 
   // Danh mục mã điểm thu -> tên đại lý thu (lấy từ public/point-names.json)
   const [pointNames, setPointNames] = useState<PointNameMap>({});
+  const [pointStt, setPointStt] = useState<Record<string, number>>({});
   useEffect(() => {
     loadPointNames().then(setPointNames).catch(() => setPointNames({}));
+    loadPointStt().then(setPointStt).catch(() => setPointStt({}));
   }, []);
 
   // Số liệu Book3 theo đúng kỳ đang lọc
   const book3 = useMemo(
-    () => buildBook3FromRecords(calculation.filteredRecords, pointNames),
-    [calculation, pointNames]
+    () => buildBook3FromRecords(calculation.filteredRecords, pointNames, pointStt),
+    [calculation, pointNames, pointStt]
   );
 
   // Handle Excel Export (Print-ready A4 Landscape)
   const handleExportExcel = () => {
-    exportBook3({
+    void exportBook3({
       rows: book3.rows,
       totals: book3.totals,
       month: filter.month,
       year: filter.year,
       agencyName: settings.agencyName,
+      departmentName: BOOK3.department,
     });
   };
 
@@ -304,19 +307,19 @@ export default function App() {
         return {
           title: D11A.title,
           badge: `${calculation.d11aRecords.length} dòng`,
-          description: `Sheet ${D11A.sheet} — tất cả biên lai trong kỳ`
+          description: `Sheet ${D11A.sheet} — cột "Tổng số thu của người tham gia"`
         };
       case 'new_rev':
         return {
           title: `${D11A.title} — chỉ dòng thu mới (${(RATE_NEW * 100).toFixed(1)}%)`,
           badge: `${calculation.d11aRecords.filter(r => r.newRevenue > 0).length} dòng`,
-          description: 'Các dòng thuộc cột "Đối tượng khai thác thu mới"'
+          description: 'Các dòng có "Số tiền NTG đóng" thuộc "Đối tượng khai thác thu mới"'
         };
       case 'reg_rev':
         return {
           title: `${D11A.title} — chỉ dòng thu thường kỳ (${(RATE_REG * 100).toFixed(1)}%)`,
           badge: `${calculation.d11aRecords.filter(r => r.regRevenue > 0).length} dòng`,
-          description: 'Các dòng thuộc cột "Đối tượng khai thác thu thường kỳ"'
+          description: 'Các dòng có "Số tiền NTG đóng" thuộc "Đối tượng khai thác thu thường kỳ"'
         };
       case 'd11a':
         return {
@@ -332,9 +335,9 @@ export default function App() {
         };
       case 'scale':
         return {
-          title: 'Bảng Tổng Hợp Theo Điểm Thu & Đội Ngũ Nhân Viên',
+          title: 'Mã điểm thu — Họ và tên nhân viên thu',
           badge: `${calculation.pointSummaries.length} điểm thu • ${calculation.staffSummaries.length} nhân viên`,
-          description: 'Thống kê quy mô hoạt động, doanh thu và thù lao theo điểm thu và nhân viên'
+          description: 'Tổng hợp theo Mã điểm thu và Mã số nhân viên thu'
         };
       default:
         return { title: 'Bảng Dữ Liệu', badge: '', description: '' };
