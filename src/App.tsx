@@ -539,6 +539,7 @@ export default function App() {
                     </button>
                   </div>
                   <ComparisonView
+                    book3Total={book3.totals.tongPhaiChi}
                     staffSummaries={calculation.staffSummaries}
                     pointSummaries={calculation.pointSummaries}
                     totals={calculation.totals}
