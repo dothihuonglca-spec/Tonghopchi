@@ -1,0 +1,328 @@
+[
+ {
+  "code": "1000436341005BD3312688001GD",
+  "name": "HGĐ Bưu điện huyện Đông Hưng",
+  "seq": 228,
+  "address": "Xã Đông Hưng, tỉnh Hưng Yên"
+ },
+ {
+  "code": "1000436341008CT3312685001GD",
+  "name": "Hộ gia đình Bưu điện Hưng Hà",
+  "seq": 229,
+  "address": "Xã Hưng Hà, tỉnh Hưng Yên",
+  "manager": "phuongnt@thaibinh.vss.gov.vn",
+  "pointCode": "BI0184D"
+ },
+ {
+  "code": "1001250886CT3312676001GD",
+  "name": "Công ty CPĐT&PTDV Phúc Thịnh - BHYT hộ gia đình Hồng An",
+  "seq": 569,
+  "address": "Xã Lê Quý Đôn, tỉnh Hưng Yên",
+  "manager": "nguyettt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312676002GD",
+  "name": "Công ty CPĐT&PTDV Phúc Thịnh - BHYT hộ gia đình xã Minh Tân",
+  "seq": 570,
+  "address": "Xã Lê Quý Đôn, tỉnh Hưng Yên",
+  "manager": "nguyettt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312676003GD",
+  "name": "Công ty CPĐT&PTDV Phúc Thịnh - BHYT hộ gia đình xã Độc Lập",
+  "seq": 571,
+  "address": "Xã Lê Quý Đôn, tỉnh Hưng Yên",
+  "manager": "nguyettt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312685001GD",
+  "name": "Công ty CPĐT&PTDV Phúc Thịnh - BHYT hộ gia đình xã Minh Hòa",
+  "seq": 572,
+  "address": "Xã Hồng Minh, tỉnh Hưng Yên",
+  "manager": "phuongnt@thaibinh.vss.gov.vn",
+  "pointCode": "BI0122C"
+ },
+ {
+  "code": "1001250886CT3312685003GD",
+  "name": "Công ty CPĐT&PTDV Phúc Thịnh - BHYT hộ gia đình xã  Chí Hòa",
+  "seq": 573,
+  "address": "Xã Hồng Minh, tỉnh Hưng Yên",
+  "manager": "phuongnt@thaibinh.vss.gov.vn",
+  "pointCode": "BI0126C"
+ },
+ {
+  "code": "1001250886CT3312685004GD",
+  "name": "Công ty CPĐT&PTDV Phúc Thịnh - BHYT hộ gia đình xã Hồng Minh (nhường)",
+  "seq": 574,
+  "address": "Xã Hồng Minh, tỉnh Hưng Yên",
+  "manager": "phuongnt@thaibinh.vss.gov.vn",
+  "pointCode": "BI0149C"
+ },
+ {
+  "code": "1001250886CT3312685005GD",
+  "name": "Công ty CPĐT&PTDV Phúc Thịnh - BHYT hộ gia đình xã Hồng Minh (toan)",
+  "seq": 575,
+  "address": "Xã Hồng Minh, tỉnh Hưng Yên",
+  "manager": "phuongnt@thaibinh.vss.gov.vn",
+  "pointCode": "BI0121C"
+ },
+ {
+  "code": "1001250886CT3312688001GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình thị trấn Đông Hưng",
+  "seq": 576,
+  "address": "Xã Đông Hưng, tỉnh Hưng Yên",
+  "manager": "hoapn@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312688002GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Nguyên Xá",
+  "seq": 577,
+  "address": "Xã Đông Hưng, tỉnh Hưng Yên",
+  "manager": "hoapn@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312688003GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Hợp",
+  "seq": 578,
+  "address": "Xã Đông Hưng, tỉnh Hưng Yên",
+  "manager": "hoapn@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312688004GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Sơn",
+  "seq": 579,
+  "address": "Xã Đông Hưng, tỉnh Hưng Yên",
+  "manager": "hoapn@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312688005GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông La",
+  "seq": 580,
+  "address": "Xã Đông Hưng, tỉnh Hưng Yên",
+  "manager": "hoapn@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312688006GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Các",
+  "seq": 581,
+  "address": "Xã Đông Hưng, tỉnh Hưng Yên",
+  "manager": "hoapn@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312694001GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Cường",
+  "seq": 582,
+  "address": "Xã Bắc Đông Hưng, tỉnh Hưng Yên",
+  "manager": "thuonghth@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312694002GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Phương",
+  "seq": 583,
+  "address": "Xã Bắc Đông Hưng, tỉnh Hưng Yên",
+  "manager": "thuonghth@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312694003GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Xá",
+  "seq": 584,
+  "address": "Xã Bắc Đông Hưng, tỉnh Hưng Yên",
+  "manager": "thuonghth@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312700001GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Liên An Đô",
+  "seq": 585,
+  "address": "Xã Bắc Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "hoangnt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312700002GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Liên Giang",
+  "seq": 586,
+  "address": "Xã Bắc Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "hoangnt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312700003GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đô Lương",
+  "seq": 587,
+  "address": "Xã Bắc Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "hoangnt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312700004GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Lô Giang",
+  "seq": 588,
+  "address": "Xã Bắc Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "hoangnt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312700005GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Mê Linh",
+  "seq": 589,
+  "address": "Xã Bắc Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "hoangnt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312700006GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Phú Lương",
+  "seq": 590,
+  "address": "Xã Bắc Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "hoangnt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312736001GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Phong Dương Tiến",
+  "seq": 591,
+  "address": "Xã Đông Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "lieuct@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312736002GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Phú Châu",
+  "seq": 592,
+  "address": "Xã Đông Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "lieuct@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312736003GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Chương Dương",
+  "seq": 593,
+  "address": "Xã Đông Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "lieuct@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312736004GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Phong Châu",
+  "seq": 594,
+  "address": "Xã Đông Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "lieuct@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312745001GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Hà Giang",
+  "seq": 595,
+  "address": "Xã Bắc Đông Quan, tỉnh Hưng Yên",
+  "manager": "manhkd@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312745002GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Kinh",
+  "seq": 596,
+  "address": "Xã Bắc Đông Quan, tỉnh Hưng Yên",
+  "manager": "manhkd@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312745003GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Vinh",
+  "seq": 597,
+  "address": "Xã Bắc Đông Quan, tỉnh Hưng Yên",
+  "manager": "manhkd@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312754001GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Minh Tân",
+  "seq": 598,
+  "address": "Xã Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "thailt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312754002GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Thăng Long",
+  "seq": 599,
+  "address": "Xã Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "thailt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312754003GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Hồng Việt",
+  "seq": 600,
+  "address": "Xã Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "thailt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312754004GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Hồng Bạch",
+  "seq": 601,
+  "address": "Xã Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "thailt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312763001GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Liên Hoa",
+  "seq": 602,
+  "address": "Xã Nam Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "vuitt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312763002GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Hồng Giang",
+  "seq": 603,
+  "address": "Xã Nam Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "vuitt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312763003GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Minh Phú",
+  "seq": 604,
+  "address": "Xã Nam Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "vuitt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312763004GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Trọng Quan",
+  "seq": 605,
+  "address": "Xã Nam Tiên Hưng, tỉnh Hưng Yên",
+  "manager": "vuitt@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312775001GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Xuân",
+  "seq": 606,
+  "address": "Xã Nam Đông Hưng, tỉnh Hưng Yên",
+  "manager": "duyennt1@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312775002GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Quang",
+  "seq": 607,
+  "address": "Xã Nam Đông Hưng, tỉnh Hưng Yên",
+  "manager": "duyennt1@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312775003GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Xuân Quang Động",
+  "seq": 608,
+  "address": "Xã Nam Đông Hưng, tỉnh Hưng Yên",
+  "manager": "duyennt1@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312775004GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Hoàng",
+  "seq": 609,
+  "address": "Xã Nam Đông Hưng, tỉnh Hưng Yên",
+  "manager": "duyennt1@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312793001GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Quan",
+  "seq": 610,
+  "address": "Xã Đông Quan, tỉnh Hưng Yên",
+  "manager": "hongnt1@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312793002GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh - BHYT hộ gia đình xã Đông Á",
+  "seq": 611,
+  "address": "Xã Đông Quan, tỉnh Hưng Yên",
+  "manager": "hongnt1@thaibinh.vss.gov.vn"
+ },
+ {
+  "code": "1001250886CT3312793003GD",
+  "name": "Cty CPĐT và PTDV Phúc Thịnh -  BHYT hộ gia đình xã Đông Tân",
+  "seq": 612,
+  "address": "Xã Đông Quan, tỉnh Hưng Yên",
+  "manager": "hongnt1@thaibinh.vss.gov.vn"
+ }
+]
