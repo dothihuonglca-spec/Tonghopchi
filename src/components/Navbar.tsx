@@ -43,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base lg:text-lg font-black uppercase tracking-tight text-white leading-tight truncate">
-                Tổng hợp số phải chi cho Đại lý thu BHXH hộ gia đình
+                Tổng hợp chi cho Đại lý thu BHXH hộ gia đình
               </h1>
               <p className="text-2xs sm:text-xs font-bold uppercase tracking-wide text-sky-100 truncate">
                 {settings.agencyName || DEFAULT_AGENCY_NAME}
