@@ -18,6 +18,7 @@ import { downloadStandardTemplate } from './utils/excelExport.ts';
 import { exportBook3 } from './utils/book3Export.ts';
 import { buildBook3FromRecords } from './utils/book3FromRecords.ts';
 import { loadPointNames, loadPointStt, PointNameMap } from './data/pointNames.ts';
+import { loadCatalog, mergeCatalog, parseCatalogFile, saveStoredCatalog } from './data/catalog.ts';
 import { D11A, D11A_HT, BOOK3 } from './data/templateNames.ts';
 
 // Components
@@ -154,6 +155,27 @@ export default function App() {
   // Danh mục mã điểm thu -> tên đại lý thu (lấy từ public/point-names.json)
   const [pointNames, setPointNames] = useState<PointNameMap>({});
   const [pointStt, setPointStt] = useState<Record<string, number>>({});
+  const [catalogNotice, setCatalogNotice] = useState<{ ok: boolean; text: string } | null>(null);
+
+  /** Nút "Nạp danh mục": mã mới → nối thêm; mã đã có → lấy dữ liệu file mới. */
+  const handleImportCatalog = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const incoming = await parseCatalogFile(file);
+      if (incoming.length === 0) throw new Error('File danh mục không có dòng dữ liệu nào.');
+      const { merged, added, updated } = mergeCatalog(await loadCatalog(), incoming);
+      saveStoredCatalog(merged);
+      setPointNames(await loadPointNames());
+      setCatalogNotice({
+        ok: true,
+        text: `Đã nạp danh mục: thêm mới ${added}, ghi đè ${updated} — tổng ${merged.length} đơn vị.`,
+      });
+    } catch (err) {
+      setCatalogNotice({ ok: false, text: err instanceof Error ? err.message : 'Không đọc được file danh mục.' });
+    }
+  };
   useEffect(() => {
     loadPointNames().then(setPointNames).catch(() => setPointNames({}));
     loadPointStt().then(setPointStt).catch(() => setPointStt({}));
@@ -413,6 +435,17 @@ export default function App() {
                     {p.month < 10 ? `0${p.month}` : p.month}/{p.year} · {p.count} BL
                   </button>
                 ))}
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                {catalogNotice && (
+                  <span className={`text-2xs font-semibold ${catalogNotice.ok ? 'text-emerald-700' : 'text-rose-600'}`}>
+                    {catalogNotice.text}
+                  </span>
+                )}
+                <label className="px-3 py-1 rounded-lg text-xs font-bold cursor-pointer border bg-white text-slate-700 border-slate-300 hover:bg-sky-100 transition-all">
+                  Nạp danh mục
+                  <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImportCatalog} />
+                </label>
               </div>
             </div>
 
