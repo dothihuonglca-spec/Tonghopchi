@@ -8,6 +8,8 @@
  * Mã nào chưa có tên thì hiển thị đúng mã đó, không bịa tên.
  */
 
+import { loadCatalog, catalogToPointNames } from './catalog.ts';
+
 const STORAGE_KEY = 'bhxh_point_names_v1';
 
 export type PointNameMap = Record<string, string>;
@@ -33,8 +35,13 @@ const readFile = async (): Promise<PointNameMap> => {
   }
 };
 
+/**
+ * Thứ tự ưu tiên (sau đè trước):
+ *   point-names.json  <  danh mục đơn vị (nút "Nạp danh mục")  <  sửa tay trong LocalStorage
+ */
 export const loadPointNames = async (): Promise<PointNameMap> => ({
   ...(await readFile()),
+  ...catalogToPointNames(await loadCatalog()),
   ...readLocal(),
 });
 
