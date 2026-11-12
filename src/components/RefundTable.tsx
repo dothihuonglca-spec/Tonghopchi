@@ -79,8 +79,8 @@ export const RefundTable: React.FC<RefundTableProps> = ({
   const rightAlign = new Set([6, 8, 10]);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div className="px-3 pt-2.5 pb-2 border-b border-slate-200 bg-slate-50">
+    <div className="bg-sky-50 rounded-xl border border-sky-200 overflow-hidden">
+      <div className="px-3 pt-2.5 pb-2 border-b border-sky-200 bg-sky-100/70">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-2xs font-bold uppercase text-slate-700 truncate">{agencyName || ''}</div>
@@ -109,14 +109,14 @@ export const RefundTable: React.FC<RefundTableProps> = ({
 
       <div className="overflow-x-auto">
         <table className="w-full text-2xs border-collapse whitespace-nowrap">
-          <thead className="bg-purple-50 text-slate-900">
+          <thead className="bg-sky-100 text-slate-900">
             <tr>
               {D11A_HT.header.map((h, i) => (
                 <th key={i} className={TH}>{h}</th>
               ))}
               <th className={TH} />
             </tr>
-            <tr className="bg-slate-200 font-mono text-3xs">
+            <tr className="bg-sky-200 font-mono text-3xs">
               {D11A_HT.codes.map((c, i) => (
                 <th key={i} className="px-1 py-0.5 border border-slate-300">{c}</th>
               ))}
@@ -132,7 +132,7 @@ export const RefundTable: React.FC<RefundTableProps> = ({
               </tr>
             )}
             {filtered.map((r, idx) => (
-              <tr key={r.id} className={idx % 2 ? 'bg-slate-50/60' : 'bg-white'}>
+              <tr key={r.id} className={idx % 2 ? 'bg-sky-50' : 'bg-white'}>
                 {Array.from({ length: 15 }, (_, i) => (
                   <td key={i} className={`${TD} ${rightAlign.has(i) ? 'text-right' : ''}`}>
                     {cells(r, i)}
@@ -153,7 +153,7 @@ export const RefundTable: React.FC<RefundTableProps> = ({
             ))}
           </tbody>
           <tfoot>
-            <tr className="bg-slate-200 font-bold text-slate-900">
+            <tr className="bg-sky-200 font-bold text-slate-900">
               <td colSpan={6} className={`${TD} text-center uppercase`}>
                 Cộng tổng ({filtered.length} dòng)
               </td>

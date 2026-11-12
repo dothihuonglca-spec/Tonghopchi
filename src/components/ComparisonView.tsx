@@ -20,6 +20,8 @@ interface ComparisonViewProps {
     totalRevenue: number;
     totalCommission: number;
   };
+  /** Tổng "Số phải chi" của Book3 (làm tròn theo từng điểm thu) — khớp file Excel. */
+  book3Total: number;
   periodTitle: string;
 }
 
@@ -27,6 +29,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
   staffSummaries,
   pointSummaries,
   totals,
+  book3Total,
   periodTitle
 }) => {
   const d11aComRatio = totals.d11aRevenue > 0
@@ -111,15 +114,15 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
 
           <div className="space-y-2 mt-4">
             <div>
-              <div className="text-3xs text-slate-400 uppercase font-medium">Tổng Doanh Thu</div>
+              <div className="text-3xs text-slate-400 uppercase font-medium">Tổng số thu của người tham gia</div>
               <div className="text-xl font-bold text-white font-mono">
                 {formatCurrency(totals.totalRevenue)} VNĐ
               </div>
             </div>
             <div>
-              <div className="text-3xs text-slate-400 uppercase font-medium">Tổng Thù Lao Hưởng</div>
+              <div className="text-3xs text-slate-400 uppercase font-medium">Tổng số Thù lao chi đại lý thu</div>
               <div className="text-2xl font-black text-amber-300 font-mono">
-                {formatCurrency(totals.totalCommission)} VNĐ
+                {formatCurrency(book3Total)} VNĐ
               </div>
             </div>
           </div>

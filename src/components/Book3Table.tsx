@@ -37,9 +37,9 @@ export const Book3Table: React.FC<Book3TableProps> = ({
   );
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div className="bg-sky-50 rounded-xl border border-sky-200 overflow-hidden">
       {/* Khối tiêu đề đúng biểu mẫu */}
-      <div className="px-3 pt-2.5 pb-2 border-b border-slate-200 bg-slate-50">
+      <div className="px-3 pt-2.5 pb-2 border-b border-sky-200 bg-sky-100/70">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-2xs font-bold uppercase text-slate-700">{agencyName || ''}</div>
@@ -56,7 +56,7 @@ export const Book3Table: React.FC<Book3TableProps> = ({
 
       <div className="overflow-x-auto">
         <table className="w-full text-2xs border-collapse">
-          <thead className="bg-amber-50 text-slate-900">
+          <thead className="bg-sky-100 text-slate-900">
             {/* dòng 6 — tầng 1 */}
             <tr>
               <th className={TH} rowSpan={4}>STT</th>
@@ -97,7 +97,7 @@ export const Book3Table: React.FC<Book3TableProps> = ({
               <th className={TH}>Tiền</th>
             </tr>
             {/* dòng 10 — mã cột */}
-            <tr className="bg-slate-200 font-mono text-3xs">
+            <tr className="bg-sky-200 font-mono text-3xs">
               {BOOK3.codes.map((c, i) => (
                 <th key={i} className="px-1 py-0.5 border border-slate-400">{c}</th>
               ))}
@@ -113,7 +113,7 @@ export const Book3Table: React.FC<Book3TableProps> = ({
               </tr>
             )}
             {rows.map((r, idx) => (
-              <tr key={r.pointCode} className={idx % 2 ? 'bg-slate-50/60' : 'bg-white'}>
+              <tr key={r.pointCode} className={idx % 2 ? 'bg-sky-50' : 'bg-white'}>
                 {cell(r.stt)}
                 {cell(r.pointCode)}
                 <td className={`${TD} text-left`}>{r.daiLyThu}</td>
@@ -135,7 +135,7 @@ export const Book3Table: React.FC<Book3TableProps> = ({
           </tbody>
 
           <tfoot>
-            <tr className="bg-slate-200 font-black text-slate-900">
+            <tr className="bg-sky-200 font-black text-slate-900">
               <td className={`${TD} text-center uppercase`} colSpan={3}>TỔNG</td>
               {cell(totals.tongNguoi)}
               {cell(totals.tangMoiNguoi)}

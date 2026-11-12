@@ -92,9 +92,9 @@ export const D11aTable: React.FC<D11aTableProps> = ({
   const rightAlign = new Set([9, 10, 11, 12, 13, 14, 15, 16]);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div className="bg-sky-50 rounded-xl border border-sky-200 overflow-hidden">
       {/* Khối tiêu đề đúng biểu mẫu */}
-      <div className="px-3 pt-2.5 pb-1.5 border-b border-slate-200 bg-slate-50">
+      <div className="px-3 pt-2.5 pb-1.5 border-b border-sky-200 bg-sky-100/70">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-2xs font-bold uppercase text-slate-700 truncate">{agencyName || ''}</div>
@@ -123,7 +123,7 @@ export const D11aTable: React.FC<D11aTableProps> = ({
 
       <div className="overflow-x-auto max-h-[560px]">
         <table className="w-full text-2xs border-collapse whitespace-nowrap">
-          <thead className="sticky top-0 z-10 bg-slate-100">
+          <thead className="sticky top-0 z-10 bg-sky-100">
             {/* tầng 1 */}
             <tr className="text-slate-900 font-bold">
               {D11A.header1.map((h, i) => {
@@ -152,7 +152,7 @@ export const D11aTable: React.FC<D11aTableProps> = ({
               ))}
             </tr>
             {/* dòng mã cột */}
-            <tr className="bg-slate-200 text-slate-700 font-mono text-3xs">
+            <tr className="bg-sky-200 text-slate-700 font-mono text-3xs">
               {D11A.codes.map((c, i) => (
                 <th key={i} className="px-1 py-0.5 border border-slate-300 text-center">{c}</th>
               ))}
@@ -167,7 +167,7 @@ export const D11aTable: React.FC<D11aTableProps> = ({
               </tr>
             )}
             {filtered.map((r, idx) => (
-              <tr key={r.id} className={idx % 2 ? 'bg-slate-50/60' : 'bg-white'}>
+              <tr key={r.id} className={idx % 2 ? 'bg-sky-50' : 'bg-white'}>
                 {Array.from({ length: 18 }, (_, i) => (
                   <td key={i}
                     className={`px-1.5 py-0.5 border border-slate-200 ${rightAlign.has(i) ? 'text-right' : ''}`}>
@@ -186,7 +186,7 @@ export const D11aTable: React.FC<D11aTableProps> = ({
             ))}
           </tbody>
           <tfoot>
-            <tr className="bg-slate-200 font-black text-slate-900 text-2xs">
+            <tr className="bg-sky-200 font-black text-slate-900 text-2xs">
               <td colSpan={9} className="px-2 py-1.5 border border-slate-300 text-center uppercase">
                 Cộng tổng ({filtered.length} dòng)
               </td>

@@ -66,7 +66,7 @@ export const PointStaffSummaryTable: React.FC<PointStaffSummaryTableProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+    <div className="bg-sky-50 rounded-xl border border-sky-200 shadow-xs overflow-hidden">
       {/* Header Banner */}
       <div className="px-4 py-3 bg-gradient-to-r from-slate-800 to-slate-900 text-white flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
         <div className="flex items-center space-x-2">
@@ -95,7 +95,7 @@ export const PointStaffSummaryTable: React.FC<PointStaffSummaryTableProps> = ({
       {/* Main Points Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
-          <thead className="bg-slate-100 border-b border-slate-300 text-slate-800 text-3xs font-bold uppercase tracking-wider text-center">
+          <thead className="bg-sky-100 border-b border-sky-300 text-slate-800 text-3xs font-bold uppercase tracking-wider text-center">
             <tr>
               <th className="px-2 py-2.5 border-r border-slate-300 w-10">STT</th>
               <th className="px-3 py-2.5 border-r border-slate-300 w-24">Mã điểm thu</th>
@@ -146,7 +146,7 @@ export const PointStaffSummaryTable: React.FC<PointStaffSummaryTableProps> = ({
                   <td className="px-3 py-2 text-right border-r border-slate-200 text-blue-900 font-bold bg-blue-50/30">
                     {formatCurrency(p.regCommission)}
                   </td>
-                  <td className="px-4 py-2 text-right border-r border-slate-200 font-black text-slate-900 bg-slate-50">
+                  <td className="px-4 py-2 text-right border-r border-slate-200 font-black text-slate-900 bg-sky-50">
                     {formatCurrency(p.totalRevenue)}
                   </td>
                   <td className="px-4 py-2 text-right border-r border-slate-200 font-black text-blue-700 bg-blue-50/60">
@@ -168,7 +168,7 @@ export const PointStaffSummaryTable: React.FC<PointStaffSummaryTableProps> = ({
           </tbody>
 
           {/* Grand Totals */}
-          <tfoot className="bg-slate-100 font-bold border-t-2 border-slate-300 text-slate-900">
+          <tfoot className="bg-sky-200 font-bold border-t-2 border-sky-300 text-slate-900">
             <tr>
               <td colSpan={4} className="px-4 py-2.5 text-right uppercase tracking-wider text-xs border-r border-slate-300">
                 CỘNG TỔNG TOÀN BỘ ({pointSummaries.length} ĐIỂM THU):
