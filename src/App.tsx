@@ -18,7 +18,16 @@ import { downloadStandardTemplate } from './utils/excelExport.ts';
 import { exportBook3 } from './utils/book3Export.ts';
 import { buildBook3FromRecords } from './utils/book3FromRecords.ts';
 import { loadPointNames, loadPointStt, PointNameMap } from './data/pointNames.ts';
-import { loadCatalog, mergeCatalog, parseCatalogFile, saveStoredCatalog } from './data/catalog.ts';
+import {
+  CatalogEntry,
+  loadCatalog,
+  mergeCatalog,
+  parseCatalogFile,
+  saveStoredCatalog,
+  resetStoredCatalog,
+  findUnmatchedPointCodes,
+} from './data/catalog.ts';
+import { CatalogModal } from './components/CatalogModal.tsx';
 import { D11A, D11A_HT, BOOK3 } from './data/templateNames.ts';
 
 // Components
@@ -83,6 +92,7 @@ export default function App() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSystemOpen, setIsSystemOpen] = useState(false);
+  const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isAddRecordOpen, setIsAddRecordOpen] = useState(false);
   const [isPeriodManagerOpen, setIsPeriodManagerOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<StaffSummaryRow | null>(null);
@@ -155,7 +165,53 @@ export default function App() {
   // Danh mục mã điểm thu -> tên đại lý thu (lấy từ public/point-names.json)
   const [pointNames, setPointNames] = useState<PointNameMap>({});
   const [pointStt, setPointStt] = useState<Record<string, number>>({});
+  const [catalog, setCatalog] = useState<CatalogEntry[]>([]);
   const [catalogNotice, setCatalogNotice] = useState<{ ok: boolean; text: string } | null>(null);
+
+  /** Lưu danh mục và cập nhật lại tên đơn vị trên Book3. */
+  const applyCatalog = async (entries: CatalogEntry[]) => {
+    saveStoredCatalog(entries);
+    setCatalog(entries);
+    setPointNames(await loadPointNames());
+  };
+
+  const handleImportCatalogJson = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      try {
+        const json = JSON.parse(String(ev.target?.result));
+        const list: unknown = Array.isArray(json) ? json : json?.catalog;
+        if (!Array.isArray(list)) throw new Error('File JSON không có danh mục đơn vị.');
+        const entries = list.filter((x): x is CatalogEntry => !!x && typeof x.code === 'string');
+        await applyCatalog(entries);
+        setCatalogNotice({ ok: true, text: `Đã khôi phục ${entries.length} đơn vị từ file JSON.` });
+      } catch (err) {
+        setCatalogNotice({ ok: false, text: err instanceof Error ? err.message : 'Không đọc được file JSON.' });
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleExportCatalogJson = () => {
+    const blob = new Blob(
+      [JSON.stringify({ appName: 'BHXH_D11A_HOA_HONG', exportedAt: new Date().toISOString(), catalog }, null, 2)],
+      { type: 'application/json' }
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Danh_muc_don_vi_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const unmatchedCodes = useMemo(
+    () => findUnmatchedPointCodes(records.map(r => r.pointCode), catalog),
+    [records, catalog]
+  );
 
   /** Nút "Nạp danh mục": mã mới → nối thêm; mã đã có → lấy dữ liệu file mới. */
   const handleImportCatalog = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,9 +221,8 @@ export default function App() {
     try {
       const incoming = await parseCatalogFile(file);
       if (incoming.length === 0) throw new Error('File danh mục không có dòng dữ liệu nào.');
-      const { merged, added, updated } = mergeCatalog(await loadCatalog(), incoming);
-      saveStoredCatalog(merged);
-      setPointNames(await loadPointNames());
+      const { merged, added, updated } = mergeCatalog(catalog, incoming);
+      await applyCatalog(merged);
       setCatalogNotice({
         ok: true,
         text: `Đã nạp danh mục: thêm mới ${added}, ghi đè ${updated} — tổng ${merged.length} đơn vị.`,
@@ -177,6 +232,7 @@ export default function App() {
     }
   };
   useEffect(() => {
+    loadCatalog().then(setCatalog).catch(() => setCatalog([]));
     loadPointNames().then(setPointNames).catch(() => setPointNames({}));
     loadPointStt().then(setPointStt).catch(() => setPointStt({}));
   }, []);
@@ -215,6 +271,8 @@ export default function App() {
       setIsPeriodManagerOpen(true);
     } else if (item === 'compare') {
       setSecondaryView(secondaryView === 'compare' ? 'none' : 'compare');
+    } else if (item === 'catalog') {
+      setIsCatalogOpen(true);
     } else if (item === 'settings') {
       setIsSettingsOpen(true);
     } else if (item === 'system') {
@@ -710,23 +768,43 @@ export default function App() {
         lastSync={storageMetrics.lastSync}
         onClose={() => setIsSettingsOpen(false)}
         onSaveSettings={setSettings}
-        onRestoreData={(recs, sett) => {
+        catalog={catalog}
+        onRestoreData={(recs, sett, cat) => {
           setRecords(recs);
           if (sett) setSettings(sett);
+          if (cat) void applyCatalog(cat);
         }}
         onClearData={handleClearData}
       />
 
+      <CatalogModal
+        isOpen={isCatalogOpen}
+        catalog={catalog}
+        unmatchedCodes={unmatchedCodes}
+        notice={catalogNotice}
+        onClose={() => setIsCatalogOpen(false)}
+        onChange={entries => { void applyCatalog(entries); }}
+        onImportExcel={handleImportCatalog}
+        onImportJson={handleImportCatalogJson}
+        onExportJson={handleExportCatalogJson}
+        onReset={async () => {
+          await applyCatalog(await resetStoredCatalog());
+          setCatalogNotice({ ok: true, text: 'Đã quay về danh mục gốc đóng gói sẵn.' });
+        }}
+      />
+
       <SystemModal
+        catalog={catalog}
         isOpen={isSystemOpen}
         records={records}
         settings={settings}
         storageSizeKB={storageMetrics.sizeKB}
         lastSync={storageMetrics.lastSync}
         onClose={() => setIsSystemOpen(false)}
-        onRestoreData={(recs, sett) => {
+        onRestoreData={(recs, sett, cat) => {
           setRecords(recs);
           if (sett) setSettings(sett);
+          if (cat) void applyCatalog(cat);
         }}
         onClearData={handleClearData}
       />
