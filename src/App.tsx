@@ -27,7 +27,7 @@ import {
   resetStoredCatalog,
   findUnmatchedPointCodes,
 } from './data/catalog.ts';
-import { CatalogModal } from './components/CatalogModal.tsx';
+import { CatalogPage } from './components/CatalogPage.tsx';
 import { D11A, D11A_HT, BOOK3 } from './data/templateNames.ts';
 
 // Components
@@ -92,7 +92,6 @@ export default function App() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSystemOpen, setIsSystemOpen] = useState(false);
-  const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isAddRecordOpen, setIsAddRecordOpen] = useState(false);
   const [isPeriodManagerOpen, setIsPeriodManagerOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<StaffSummaryRow | null>(null);
@@ -208,6 +207,14 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
+  const recordCountByPoint = useMemo(() => {
+    const out: Record<string, number> = {};
+    records.forEach(r => {
+      if (r.pointCode) out[r.pointCode] = (out[r.pointCode] ?? 0) + 1;
+    });
+    return out;
+  }, [records]);
+
   const unmatchedCodes = useMemo(
     () => findUnmatchedPointCodes(records.map(r => r.pointCode), catalog),
     [records, catalog]
@@ -262,7 +269,9 @@ export default function App() {
 
   // Handle Left Sidebar Menu Selection
   const handleSelectMenuItem = (item: SidebarMenuItem) => {
-    setActiveMenuItem(item);
+    // Đang ở trang Danh mục mà mở hộp thoại (tải file, cài đặt...) thì giữ nguyên trang.
+    const isModalItem = item === 'upload' || item === 'months' || item === 'settings' || item === 'system';
+    if (!(isModalItem && activeMenuItem === 'catalog')) setActiveMenuItem(item);
     if (item === 'dashboard') {
       setSecondaryView('none');
     } else if (item === 'upload') {
@@ -272,7 +281,7 @@ export default function App() {
     } else if (item === 'compare') {
       setSecondaryView(secondaryView === 'compare' ? 'none' : 'compare');
     } else if (item === 'catalog') {
-      setIsCatalogOpen(true);
+      setSecondaryView('none');
     } else if (item === 'settings') {
       setIsSettingsOpen(true);
     } else if (item === 'system') {
@@ -465,6 +474,22 @@ export default function App() {
         {/* KHỐI THỐNG NHẤT BÊN PHẢI (MASTER RIGHT PANEL) */}
         {/* ========================================================================= */}
         <main className="flex-1 min-w-0 w-full space-y-5">
+          {activeMenuItem === 'catalog' ? (
+            <CatalogPage
+              catalog={catalog}
+              unmatchedCodes={unmatchedCodes}
+              recordCountByPoint={recordCountByPoint}
+              notice={catalogNotice}
+              onChange={entries => { void applyCatalog(entries); }}
+              onImportExcel={handleImportCatalog}
+              onImportJson={handleImportCatalogJson}
+              onExportJson={handleExportCatalogJson}
+              onReset={async () => {
+                await applyCatalog(await resetStoredCatalog());
+                setCatalogNotice({ ok: true, text: 'Đã quay về danh mục gốc đóng gói sẵn.' });
+              }}
+            />
+          ) : (
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             
             {/* 1. Months Bar / Quick Period Switcher (Persisted in LocalStorage) - Removed 'Quản lý chi tiết các tháng >>' text */}
@@ -742,6 +767,7 @@ export default function App() {
             </div>
 
           </div>
+          )}
         </main>
       </div>
 
@@ -775,22 +801,6 @@ export default function App() {
           if (cat) void applyCatalog(cat);
         }}
         onClearData={handleClearData}
-      />
-
-      <CatalogModal
-        isOpen={isCatalogOpen}
-        catalog={catalog}
-        unmatchedCodes={unmatchedCodes}
-        notice={catalogNotice}
-        onClose={() => setIsCatalogOpen(false)}
-        onChange={entries => { void applyCatalog(entries); }}
-        onImportExcel={handleImportCatalog}
-        onImportJson={handleImportCatalogJson}
-        onExportJson={handleExportCatalogJson}
-        onReset={async () => {
-          await applyCatalog(await resetStoredCatalog());
-          setCatalogNotice({ ok: true, text: 'Đã quay về danh mục gốc đóng gói sẵn.' });
-        }}
       />
 
       <SystemModal
