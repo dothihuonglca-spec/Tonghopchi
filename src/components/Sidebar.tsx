@@ -14,7 +14,8 @@ import {
   FileSpreadsheet,
   HardDrive,
   Calendar,
-  Check
+  Check,
+  Building2
 } from 'lucide-react';
 
 export type SidebarMenuItem = 
@@ -22,6 +23,7 @@ export type SidebarMenuItem =
   | 'upload' 
   | 'months' 
   | 'compare' 
+  | 'catalog' 
   | 'settings' 
   | 'system';
 
@@ -70,6 +72,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'So sánh phát sinh',
       icon: GitCompare,
       description: 'Đối chiếu D11A và D11A_HT'
+    },
+    {
+      id: 'catalog' as SidebarMenuItem,
+      label: 'Danh mục đơn vị',
+      icon: Building2,
+      description: 'Mã ĐV, tên đơn vị, liên kết Mã điểm thu'
     },
     {
       id: 'settings' as SidebarMenuItem,
