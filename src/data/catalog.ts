@@ -46,6 +46,18 @@ export const shortName = (full: string): string => {
   return (m ? m[1] : clean).trim();
 };
 
+/** Mã điểm thu (BI...) trong dữ liệu mà danh mục chưa liên kết với đơn vị nào. */
+export const findUnmatchedPointCodes = (codes: string[], entries: CatalogEntry[]): string[] => {
+  const known = new Set<string>();
+  entries.forEach(e => {
+    if (e.pointCode) known.add(key(e.pointCode));
+    known.add(key(e.code));
+  });
+  return Array.from(new Set(codes.map(c => c.trim()).filter(Boolean)))
+    .filter(c => !known.has(key(c)))
+    .sort();
+};
+
 /** Gộp: mã mới thì nối thêm, mã đã có thì lấy dữ liệu mới. */
 export const mergeCatalog = (base: CatalogEntry[], incoming: CatalogEntry[]): MergeResult => {
   const map = new Map<string, CatalogEntry>();
@@ -71,13 +83,14 @@ export const mergeCatalog = (base: CatalogEntry[], incoming: CatalogEntry[]): Me
   return { merged: Array.from(map.values()), added, updated };
 };
 
-const readStored = (): CatalogEntry[] => {
+/** null = chưa từng lưu (dùng bản đóng gói sẵn); mảng (kể cả rỗng) = bản người dùng đã chỉnh. */
+const readStored = (): CatalogEntry[] | null => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = raw ? JSON.parse(raw) : null;
+    return Array.isArray(parsed) ? parsed : null;
   } catch {
-    return [];
+    return null;
   }
 };
 
@@ -92,9 +105,21 @@ const readSeed = async (): Promise<CatalogEntry[]> => {
   }
 };
 
-/** Danh mục hiện hành = bản đóng gói sẵn + bản đã nạp trong ứng dụng (bản nạp đè lên). */
-export const loadCatalog = async (): Promise<CatalogEntry[]> =>
-  mergeCatalog(await readSeed(), readStored()).merged;
+/**
+ * Danh mục hiện hành: nếu người dùng đã nạp/sửa trong ứng dụng thì dùng bản đó
+ * (để xóa/sửa dòng được giữ lại); chưa có thì dùng bản đóng gói sẵn trong code.
+ */
+export const loadCatalog = async (): Promise<CatalogEntry[]> => readStored() ?? (await readSeed());
+
+/** Bỏ bản đã chỉnh trong trình duyệt, quay về danh mục đóng gói sẵn. */
+export const resetStoredCatalog = async (): Promise<CatalogEntry[]> => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* bỏ qua */
+  }
+  return readSeed();
+};
 
 export const saveStoredCatalog = (entries: CatalogEntry[]): void => {
   try {
