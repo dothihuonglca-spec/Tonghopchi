@@ -84,14 +84,20 @@ export const getStorageMetrics = () => {
   }
 };
 
-export const exportBackupJSON = (records: D11aRow[], settings: AgencySettings) => {
+export const exportBackupJSON = (
+  records: D11aRow[],
+  settings: AgencySettings,
+  catalog: unknown[] = []
+) => {
   const backup = {
     appName: 'BHXH_D11A_HOA_HONG',
     exportedAt: new Date().toISOString(),
-    version: '1.0',
+    version: '1.1',
     settings,
     totalRecords: records.length,
-    records
+    records,
+    totalCatalog: catalog.length,
+    catalog // Danh mục đơn vị (Mã ĐV, tên, mã điểm thu...)
   };
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
