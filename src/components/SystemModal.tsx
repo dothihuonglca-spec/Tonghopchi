@@ -6,6 +6,7 @@
 import React, { useRef } from 'react';
 import { D11aRow, AgencySettings } from '../types/index.ts';
 import { exportBackupJSON, clearAllStoredData } from '../utils/storage.ts';
+import { CatalogEntry } from '../data/catalog.ts';
 import { 
   X, 
   Server, 
@@ -26,7 +27,9 @@ interface SystemModalProps {
   storageSizeKB: string;
   lastSync: string;
   onClose: () => void;
-  onRestoreData: (records: D11aRow[], settings?: AgencySettings) => void;
+  onRestoreData: (records: D11aRow[], settings?: AgencySettings, catalog?: CatalogEntry[]) => void;
+  /** Danh mục đơn vị hiện hành — được đưa vào file sao lưu. */
+  catalog?: CatalogEntry[];
   onClearData: () => void;
 }
 
@@ -38,6 +41,7 @@ export const SystemModal: React.FC<SystemModalProps> = ({
   lastSync,
   onClose,
   onRestoreData,
+  catalog = [],
   onClearData
 }) => {
   const restoreFileInputRef = useRef<HTMLInputElement>(null);
@@ -45,7 +49,7 @@ export const SystemModal: React.FC<SystemModalProps> = ({
   if (!isOpen) return null;
 
   const handleBackup = () => {
-    exportBackupJSON(records, settings);
+    exportBackupJSON(records, settings, catalog);
   };
 
   const handleRestoreFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,8 +61,16 @@ export const SystemModal: React.FC<SystemModalProps> = ({
       try {
         const json = JSON.parse(event.target?.result as string);
         if (json && Array.isArray(json.records)) {
-          onRestoreData(json.records, json.settings);
-          alert(`Khôi phục thành công ${json.records.length} bản ghi từ file sao lưu JSON!`);
+          onRestoreData(
+            json.records,
+            json.settings,
+            Array.isArray(json.catalog) ? json.catalog : undefined
+          );
+          alert(
+            `Khôi phục thành công ${json.records.length} bản ghi` +
+              (Array.isArray(json.catalog) ? ` và ${json.catalog.length} đơn vị trong danh mục` : '') +
+              ' từ file sao lưu JSON!'
+          );
           onClose();
         } else {
           alert('File JSON sao lưu không hợp lệ.');
@@ -141,7 +153,7 @@ export const SystemModal: React.FC<SystemModalProps> = ({
                   <span>Sao lưu dữ liệu (Tải JSON)</span>
                 </div>
                 <p className="text-2xs text-slate-600">
-                  Xuất toàn bộ biên lai các tháng và cài đặt ra máy tính để lưu trữ dự phòng.
+                  Xuất toàn bộ biên lai các tháng, cài đặt và danh mục đơn vị ra máy tính để lưu trữ dự phòng.
                 </p>
               </button>
 

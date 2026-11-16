@@ -6,6 +6,7 @@
 import React, { useState, useRef } from 'react';
 import { AgencySettings, D11aRow } from '../types/index.ts';
 import { exportBackupJSON, clearAllStoredData } from '../utils/storage.ts';
+import { CatalogEntry } from '../data/catalog.ts';
 import { 
   X, 
   Settings, 
@@ -28,7 +29,9 @@ interface SettingsModalProps {
   lastSync: string;
   onClose: () => void;
   onSaveSettings: (settings: AgencySettings) => void;
-  onRestoreData: (records: D11aRow[], settings?: AgencySettings) => void;
+  onRestoreData: (records: D11aRow[], settings?: AgencySettings, catalog?: CatalogEntry[]) => void;
+  /** Danh mục đơn vị hiện hành — được đưa vào file sao lưu. */
+  catalog?: CatalogEntry[];
   onClearData: () => void;
 }
 
@@ -41,6 +44,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   onSaveSettings,
   onRestoreData,
+  catalog = [],
   onClearData
 }) => {
   const [formData, setFormData] = useState<AgencySettings>({ ...settings });
@@ -57,7 +61,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleBackup = () => {
-    exportBackupJSON(records, formData);
+    exportBackupJSON(records, formData, catalog);
   };
 
   const handleRestoreFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,8 +73,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       try {
         const json = JSON.parse(event.target?.result as string);
         if (json && Array.isArray(json.records)) {
-          onRestoreData(json.records, json.settings);
-          alert(`Khôi phục thành công ${json.records.length} bản ghi từ file sao lưu!`);
+          onRestoreData(
+            json.records,
+            json.settings,
+            Array.isArray(json.catalog) ? json.catalog : undefined
+          );
+          alert(
+            `Khôi phục thành công ${json.records.length} bản ghi` +
+              (Array.isArray(json.catalog) ? ` và ${json.catalog.length} đơn vị trong danh mục` : '') +
+              ' từ file sao lưu!'
+          );
           onClose();
         } else {
           alert('File JSON sao lưu không hợp lệ.');
