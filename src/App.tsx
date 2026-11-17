@@ -11,8 +11,7 @@ import {
   loadStoredSettings, 
   saveStoredSettings, 
   clearAllStoredData,
-  getStorageMetrics
-} from './utils/storage.ts';
+  getStorageMetrics, loadStoredUnc, saveStoredUnc } from './utils/storage.ts';
 import { filterAndCalculate } from './utils/calculator.ts';
 import { downloadStandardTemplate } from './utils/excelExport.ts';
 import { exportBook3 } from './utils/book3Export.ts';
@@ -28,6 +27,9 @@ import {
   findUnmatchedPointCodes,
 } from './data/catalog.ts';
 import { CatalogPage } from './components/CatalogPage.tsx';
+import { DataManagerPage } from './components/DataManagerPage.tsx';
+import { UncRow } from './types/unc.ts';
+import { filterUncByPeriod, uncTotalsByCode } from './utils/unc.ts';
 import { D11A, D11A_HT, BOOK3 } from './data/templateNames.ts';
 
 // Components
@@ -93,6 +95,9 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSystemOpen, setIsSystemOpen] = useState(false);
   const [isAddRecordOpen, setIsAddRecordOpen] = useState(false);
+  const [dataTab, setDataTab] = useState<'D11A' | 'D11A_HT' | 'UNC'>('D11A');
+  const [addSheet, setAddSheet] = useState<'D11A' | 'D11A_HT' | null>(null);
+  const [uncRows, setUncRows] = useState<UncRow[]>(() => loadStoredUnc());
   const [isPeriodManagerOpen, setIsPeriodManagerOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<StaffSummaryRow | null>(null);
 
@@ -101,6 +106,11 @@ export default function App() {
     saveStoredRecords(records);
     setStorageMetrics(getStorageMetrics());
   }, [records]);
+
+  // Lưu UNC vào LocalStorage mỗi khi thay đổi
+  useEffect(() => {
+    saveStoredUnc(uncRows);
+  }, [uncRows]);
 
   // Sync settings with LocalStorage
   useEffect(() => {
@@ -250,9 +260,15 @@ export default function App() {
     [calculation, pointNames, pointStt]
   );
 
+  // UNC của đúng kỳ đang chọn → tổng Tiền VND theo Mã đơn vị (để so sánh ở Book3)
+  const uncPeriodRows = useMemo(() => filterUncByPeriod(uncRows, filter), [uncRows, filter]);
+  const uncByCode = useMemo(() => uncTotalsByCode(uncPeriodRows), [uncPeriodRows]);
+
   // Handle Excel Export (Print-ready A4 Landscape)
   const handleExportExcel = () => {
     void exportBook3({
+      // Chỉ thêm cột "So sánh UNC" khi kỳ này đã có UNC
+      uncByCode: uncPeriodRows.length > 0 ? uncByCode : undefined,
       rows: book3.rows,
       totals: book3.totals,
       month: filter.month,
@@ -270,12 +286,13 @@ export default function App() {
   // Handle Left Sidebar Menu Selection
   const handleSelectMenuItem = (item: SidebarMenuItem) => {
     // Đang ở trang Danh mục mà mở hộp thoại (tải file, cài đặt...) thì giữ nguyên trang.
-    const isModalItem = item === 'upload' || item === 'months' || item === 'settings' || item === 'system';
+    const isModalItem = item === 'months' || item === 'settings' || item === 'system';
     if (!(isModalItem && activeMenuItem === 'catalog')) setActiveMenuItem(item);
     if (item === 'dashboard') {
       setSecondaryView('none');
     } else if (item === 'upload') {
-      setIsUploadOpen(true);
+      setDataTab('D11A');
+      setSecondaryView('none');
     } else if (item === 'months') {
       setIsPeriodManagerOpen(true);
     } else if (item === 'compare') {
@@ -366,6 +383,11 @@ export default function App() {
     if (confirm('Bạn có chắc chắn muốn xóa dòng biên lai này không?')) {
       setRecords(prev => prev.filter(r => r.id !== id));
     }
+  };
+
+  // Sửa một dòng biên lai (D11A / D11A_HT)
+  const handleUpdateRecord = (record: D11aRow) => {
+    setRecords(prev => prev.map(r => (r.id === record.id ? record : r)));
   };
 
   // Handle Add Single Record
@@ -474,7 +496,20 @@ export default function App() {
         {/* KHỐI THỐNG NHẤT BÊN PHẢI (MASTER RIGHT PANEL) */}
         {/* ========================================================================= */}
         <main className="flex-1 min-w-0 w-full space-y-5">
-          {activeMenuItem === 'catalog' ? (
+          {activeMenuItem === 'upload' ? (
+            <DataManagerPage
+              key={dataTab}
+              initialTab={dataTab}
+              records={records}
+              uncRows={uncRows}
+              filter={filter}
+              onOpenUpload={() => setIsUploadOpen(true)}
+              onAddRecord={source => { setAddSheet(source); setIsAddRecordOpen(true); }}
+              onUpdateRecord={handleUpdateRecord}
+              onDeleteRecord={handleDeleteRecord}
+              onUncChange={setUncRows}
+            />
+          ) : activeMenuItem === 'catalog' ? (
             <CatalogPage
               catalog={catalog}
               unmatchedCodes={unmatchedCodes}
@@ -525,6 +560,12 @@ export default function App() {
                     {catalogNotice.text}
                   </span>
                 )}
+                <button
+                  onClick={() => { setDataTab('UNC'); setActiveMenuItem('upload'); setSecondaryView('none'); }}
+                  className="px-3 py-1 rounded-lg text-xs font-bold cursor-pointer border bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 transition-all"
+                >
+                  Nạp file UNC
+                </button>
                 <label className="px-3 py-1 rounded-lg text-xs font-bold cursor-pointer border bg-white text-slate-700 border-slate-300 hover:bg-sky-100 transition-all">
                   Nạp danh mục
                   <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImportCatalog} />
@@ -690,6 +731,8 @@ export default function App() {
                       month={filter.month}
                       year={filter.year}
                       agencyName={settings.agencyName}
+                      uncByCode={uncByCode}
+                      uncCount={uncPeriodRows.length}
                     />
                   )}
 
@@ -795,10 +838,12 @@ export default function App() {
         onClose={() => setIsSettingsOpen(false)}
         onSaveSettings={setSettings}
         catalog={catalog}
-        onRestoreData={(recs, sett, cat) => {
+        unc={uncRows}
+        onRestoreData={(recs, sett, cat, unc) => {
           setRecords(recs);
           if (sett) setSettings(sett);
           if (cat) void applyCatalog(cat);
+          if (unc) setUncRows(unc);
         }}
         onClearData={handleClearData}
       />
@@ -811,10 +856,12 @@ export default function App() {
         storageSizeKB={storageMetrics.sizeKB}
         lastSync={storageMetrics.lastSync}
         onClose={() => setIsSystemOpen(false)}
-        onRestoreData={(recs, sett, cat) => {
+        unc={uncRows}
+        onRestoreData={(recs, sett, cat, unc) => {
           setRecords(recs);
           if (sett) setSettings(sett);
           if (cat) void applyCatalog(cat);
+          if (unc) setUncRows(unc);
         }}
         onClearData={handleClearData}
       />
@@ -827,11 +874,12 @@ export default function App() {
       />
 
       <AddRecordModal
+        key={`${addSheet ?? activeBlockId}-${isAddRecordOpen}`}
         isOpen={isAddRecordOpen}
-        activeSheet={activeBlockId === 'd11a_ht' ? 'D11A_HT' : 'D11A'}
+        activeSheet={addSheet ?? (activeBlockId === 'd11a_ht' ? 'D11A_HT' : 'D11A')}
         availablePoints={availablePoints}
         availableStaff={availableStaff}
-        onClose={() => setIsAddRecordOpen(false)}
+        onClose={() => { setIsAddRecordOpen(false); setAddSheet(null); }}
         onAddRecord={handleAddRecord}
       />
 

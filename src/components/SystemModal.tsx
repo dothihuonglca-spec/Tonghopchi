@@ -7,6 +7,7 @@ import React, { useRef } from 'react';
 import { D11aRow, AgencySettings } from '../types/index.ts';
 import { exportBackupJSON, clearAllStoredData } from '../utils/storage.ts';
 import { CatalogEntry } from '../data/catalog.ts';
+import { UncRow } from '../types/unc.ts';
 import { 
   X, 
   Server, 
@@ -27,7 +28,9 @@ interface SystemModalProps {
   storageSizeKB: string;
   lastSync: string;
   onClose: () => void;
-  onRestoreData: (records: D11aRow[], settings?: AgencySettings, catalog?: CatalogEntry[]) => void;
+  onRestoreData: (records: D11aRow[], settings?: AgencySettings, catalog?: CatalogEntry[], unc?: UncRow[]) => void;
+  /** Ủy nhiệm chi (UNC) hiện có — được đưa vào file sao lưu. */
+  unc?: UncRow[];
   /** Danh mục đơn vị hiện hành — được đưa vào file sao lưu. */
   catalog?: CatalogEntry[];
   onClearData: () => void;
@@ -42,6 +45,7 @@ export const SystemModal: React.FC<SystemModalProps> = ({
   onClose,
   onRestoreData,
   catalog = [],
+  unc = [],
   onClearData
 }) => {
   const restoreFileInputRef = useRef<HTMLInputElement>(null);
@@ -49,7 +53,7 @@ export const SystemModal: React.FC<SystemModalProps> = ({
   if (!isOpen) return null;
 
   const handleBackup = () => {
-    exportBackupJSON(records, settings, catalog);
+    exportBackupJSON(records, settings, catalog, unc);
   };
 
   const handleRestoreFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +68,8 @@ export const SystemModal: React.FC<SystemModalProps> = ({
           onRestoreData(
             json.records,
             json.settings,
-            Array.isArray(json.catalog) ? json.catalog : undefined
+            Array.isArray(json.catalog) ? json.catalog : undefined,
+            Array.isArray(json.unc) ? json.unc : undefined
           );
           alert(
             `Khôi phục thành công ${json.records.length} bản ghi` +

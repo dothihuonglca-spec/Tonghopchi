@@ -9,6 +9,7 @@ import { FileSpreadsheet } from 'lucide-react';
 import { Book3Row } from '../types/book3.ts';
 import { formatCurrency } from '../utils/excelExport.ts';
 import { BOOK3 } from '../data/templateNames.ts';
+import { normPoint, uncCompare } from '../utils/unc.ts';
 
 interface Book3TableProps {
   rows: Book3Row[];
@@ -17,6 +18,10 @@ interface Book3TableProps {
   year: number;
   agencyName?: string;
   departmentName?: string;
+  /** Tổng Tiền VND của UNC theo Mã đơn vị, ĐÃ lọc đúng kỳ. */
+  uncByCode?: Record<string, number>;
+  /** Số dòng UNC có trong kỳ (0 = chưa nạp UNC cho kỳ này). */
+  uncCount?: number;
 }
 
 const TH = 'px-1.5 py-1 border border-slate-400 text-center align-middle font-bold';
@@ -28,8 +33,30 @@ export const Book3Table: React.FC<Book3TableProps> = ({
   month,
   year,
   agencyName,
-  departmentName
+  departmentName,
+  uncByCode = {},
+  uncCount = 0
 }) => {
+  const hasUnc = uncCount > 0;
+  const COLS = 17;
+  const rowCodes = new Set(rows.map(r => normPoint(r.pointCode)));
+  const orphan = Object.entries(uncByCode).filter(([c]) => !rowCodes.has(c));
+  const uncCell = (r: Pick<Book3Row, 'tongThu' | 'thoaiTangMoiTien' | 'thoaiTaiTucTien' | 'pointCode'>, uncAmount?: number) => {
+    if (!hasUnc) return <td className={`${TD} text-center text-slate-400`}>—</td>;
+    const c = uncCompare(r, uncAmount ?? uncByCode[normPoint(r.pointCode)] ?? 0);
+    const ok = c.diff === 0;
+    return (
+      <td
+        className={`${TD} text-right ${ok ? 'bg-emerald-50' : 'bg-rose-50'}`}
+        title={`Tổng số thu − Thoái thu tăng mới − Thoái thu tái tục = ${formatCurrency(c.expected)}; UNC = ${formatCurrency(c.unc)}`}
+      >
+        <div className={`font-bold ${ok ? 'text-emerald-700' : 'text-rose-600'}`}>
+          {ok ? 'Khớp' : `${c.diff > 0 ? '+' : ''}${formatCurrency(c.diff)}`}
+        </div>
+        <div className="text-3xs text-slate-500">UNC: {formatCurrency(c.unc)}</div>
+      </td>
+    );
+  };
   const cell = (v: number | string, money = false) => (
     <td className={`${TD} ${money ? 'text-right' : 'text-center'}`}>
       {money ? formatCurrency(Number(v)) : v}
@@ -68,6 +95,7 @@ export const Book3Table: React.FC<Book3TableProps> = ({
               <th className={TH} colSpan={3}>
                 Số phải chi Thù lao chi cho tổ chức làm đại lý thu
               </th>
+              <th className={TH} rowSpan={4}>So sánh UNC</th>
             </tr>
             {/* dòng 7 — tầng 2 */}
             <tr>
@@ -101,13 +129,14 @@ export const Book3Table: React.FC<Book3TableProps> = ({
               {BOOK3.codes.map((c, i) => (
                 <th key={i} className="px-1 py-0.5 border border-slate-400">{c}</th>
               ))}
+              <th className="px-1 py-0.5 border border-slate-400">14=(4-8-10)-UNC</th>
             </tr>
           </thead>
 
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={16} className="px-3 py-6 text-center text-slate-500">
+                <td colSpan={COLS} className="px-3 py-6 text-center text-slate-500">
                   Không có dữ liệu trong kỳ này.
                 </td>
               </tr>
@@ -130,6 +159,7 @@ export const Book3Table: React.FC<Book3TableProps> = ({
                 {cell(r.tongPhaiChi, true)}
                 {cell(r.phaiChiTangMoi, true)}
                 {cell(r.phaiChiTaiTuc, true)}
+                {uncCell(r)}
               </tr>
             ))}
           </tbody>
@@ -150,10 +180,27 @@ export const Book3Table: React.FC<Book3TableProps> = ({
               {cell(totals.tongPhaiChi, true)}
               {cell(totals.phaiChiTangMoi, true)}
               {cell(totals.phaiChiTaiTuc, true)}
+              {uncCell({
+                pointCode: '',
+                tongThu: totals.tongThu,
+                thoaiTangMoiTien: totals.thoaiTangMoiTien,
+                thoaiTaiTucTien: totals.thoaiTaiTucTien,
+              }, rows.reduce((sum, r) => sum + (uncByCode[normPoint(r.pointCode)] ?? 0), 0))}
             </tr>
           </tfoot>
         </table>
       </div>
+      {hasUnc && orphan.length > 0 && (
+        <div className="px-3 py-2 text-2xs text-amber-900 bg-amber-50 border-t border-amber-200">
+          UNC có mã đơn vị không nằm trong bảng này:{' '}
+          {orphan.map(([c, v]) => `${c} (${formatCurrency(v)})`).join(', ')}.
+        </div>
+      )}
+      {!hasUnc && (
+        <div className="px-3 py-2 text-2xs text-slate-600 border-t border-sky-200">
+          Chưa có UNC cho kỳ này — vào menu "Tải file lên" → thẻ UNC để nạp file.
+        </div>
+      )}
     </div>
   );
 };

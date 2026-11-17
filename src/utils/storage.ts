@@ -5,6 +5,7 @@
  * đều phải đến từ file người dùng nạp, tránh nhầm dữ liệu giả với dữ liệu thật.
  */
 
+import { UncRow } from '../types/unc.ts';
 import { D11aRow, AgencySettings } from '../types/index.ts';
 import { EMPTY_SETTINGS } from '../constants.ts';
 
@@ -21,6 +22,28 @@ export const loadStoredRecords = (): D11aRow[] => {
   } catch (err) {
     console.error('Failed to load from LocalStorage:', err);
     return [];
+  }
+};
+
+const STORAGE_KEY_UNC = 'bhxh_unc_v1';
+
+export const loadStoredUnc = (): UncRow[] => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_UNC);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+export const saveStoredUnc = (rows: UncRow[]): boolean => {
+  try {
+    localStorage.setItem(STORAGE_KEY_UNC, JSON.stringify(rows));
+    return true;
+  } catch (err) {
+    console.error('Không lưu được dữ liệu UNC:', err);
+    return false;
   }
 };
 
@@ -87,7 +110,8 @@ export const getStorageMetrics = () => {
 export const exportBackupJSON = (
   records: D11aRow[],
   settings: AgencySettings,
-  catalog: unknown[] = []
+  catalog: unknown[] = [],
+  unc: UncRow[] = []
 ) => {
   const backup = {
     appName: 'BHXH_D11A_HOA_HONG',
@@ -97,7 +121,9 @@ export const exportBackupJSON = (
     totalRecords: records.length,
     records,
     totalCatalog: catalog.length,
-    catalog // Danh mục đơn vị (Mã ĐV, tên, mã điểm thu...)
+    catalog, // Danh mục đơn vị (Mã ĐV, tên, mã điểm thu...)
+    totalUnc: unc.length,
+    unc // Ủy nhiệm chi (UNC)
   };
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);

@@ -22,6 +22,8 @@ export interface Book3ExportOptions {
   agencyName?: string;
   departmentName?: string;
   fileName?: string;
+  /** Tổng Tiền VND của UNC theo Mã đơn vị (đã lọc đúng kỳ). Có thì thêm cột "So sánh UNC". */
+  uncByCode?: Record<string, number>;
 }
 
 const MONEY_FMT = '#,##0';
@@ -34,8 +36,16 @@ export const book3ReportTitle = (month: number, year: number): string =>
   `THÁNG ${month} NĂM ${year}`;
 
 /** Dựng mảng 2 chiều đúng thứ tự ô của mẫu Book3. */
+const uncDiff = (r: Pick<Book3Row, 'tongThu' | 'thoaiTangMoiTien' | 'thoaiTaiTucTien'>, unc: number) =>
+  r.tongThu - r.thoaiTangMoiTien - r.thoaiTaiTucTien - unc;
+
 export const book3Aoa = (opts: Book3ExportOptions): unknown[][] => {
   const { rows, totals, month, year } = opts;
+  const withUnc = !!opts.uncByCode;
+  const unc = opts.uncByCode ?? {};
+  const uncOf = (code: string) => unc[code.trim().toUpperCase()] ?? 0;
+  /** Thêm ô cuối cho cột "So sánh UNC" (chỉ khi có UNC). */
+  const tail = (cell: unknown): unknown[] => (withUnc ? [cell] : []);
   const title = book3ReportTitle(month, year);
 
   const aoa: unknown[][] = [];
@@ -55,6 +65,7 @@ export const book3Aoa = (opts: Book3ExportOptions): unknown[][] => {
     'Số thu', '', '',
     'Số thoái thu', '', '', '',
     'Số phải chi Thù lao chi cho tổ chức làm \nđại lý thu', '', '',
+    ...tail('So sánh UNC'),
   ]);
   // 7: tầng 2
   aoa.push([
@@ -63,6 +74,7 @@ export const book3Aoa = (opts: Book3ExportOptions): unknown[][] => {
     'Tổng số', 'Trong đó', '',
     `HGĐ tháng ${month}/${year}`, '', '', '',
     'Tổng số', 'Trong đó', '',
+    ...tail(''),
   ]);
   // 8: tầng 3  (N8 để trống vì N7:N9 đã gộp; O8 = "Tăng mới", P8 = "Tái tục")
   aoa.push([
@@ -70,15 +82,17 @@ export const book3Aoa = (opts: Book3ExportOptions): unknown[][] => {
     '', 'Tăng mới', 'Tái tục',
     'Tăng mới', '', 'Tái tục', '',
     '', 'Tăng mới', 'Tái tục',
+    ...tail(''),
   ]);
   // 9: tầng 4 (đơn vị Người / Tiền)
   aoa.push([
     '', '', '', '', '', '', '', '', '',
     'Người', 'Tiền', 'Người', 'Tiền',
     '', '', '',
+    ...tail(''),
   ]);
   // 10: mã cột
-  aoa.push(['A', '', 'B', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, '12=5*9,8%', '13=6*4,2%']);
+  aoa.push(['A', '', 'B', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, '12=5*9,8%', '13=6*4,2%', ...tail('14=(4-8-10)-UNC')]);
 
   // 11+: dữ liệu
   for (const r of rows) {
@@ -88,6 +102,7 @@ export const book3Aoa = (opts: Book3ExportOptions): unknown[][] => {
       r.tongThu, r.tangMoiThu, r.taiTucThu,
       r.thoaiTangMoiNguoi, r.thoaiTangMoiTien, r.thoaiTaiTucNguoi, r.thoaiTaiTucTien,
       r.tongPhaiChi, r.phaiChiTangMoi, r.phaiChiTaiTuc,
+      ...tail(uncDiff(r, uncOf(r.pointCode))),
     ]);
   }
 
@@ -98,6 +113,7 @@ export const book3Aoa = (opts: Book3ExportOptions): unknown[][] => {
     totals.tongThu, totals.tangMoiThu, totals.taiTucThu,
     totals.thoaiTangMoiNguoi, totals.thoaiTangMoiTien, totals.thoaiTaiTucNguoi, totals.thoaiTaiTucTien,
     totals.tongPhaiChi, totals.phaiChiTangMoi, totals.phaiChiTaiTuc,
+    ...tail(uncDiff(totals, rows.reduce((s, r) => s + uncOf(r.pointCode), 0))),
   ]);
 
   return aoa;
@@ -137,16 +153,20 @@ export const buildBook3Workbook = async (opts: Book3ExportOptions) => {
 
   aoa.forEach(r => ws.addRow(r));
 
+  const withUnc = !!opts.uncByCode;
+  const lastCol = withUnc ? 17 : 16;         // Q khi có cột "So sánh UNC"
+  const lastLetter = withUnc ? 'Q' : 'P';
   const lastDataRow = 10 + rows.length;      // dòng dữ liệu cuối (1-based)
   const totalRow = aoa.length;               // dòng TỔNG (1-based)
 
   const merges = [
-    'A1:G1', 'A2:G2', 'A4:P4',
+    'A1:G1', 'A2:G2', `A4:${lastLetter}4`,
     'A6:A9', 'B6:B9', 'C6:C9', 'D6:F6', 'D7:D9', 'E7:E9', 'F7:F9',
     'G6:I6', 'G7:G9', 'H7:I7', 'H8:H9', 'I8:I9',
     'J6:M6', 'J7:M7', 'J8:K8', 'L8:M8',
     'N6:P6', 'N7:N9', 'O7:P7', 'O8:O9', 'P8:P9',
     `A${totalRow}:C${totalRow}`,
+    ...(withUnc ? ['Q6:Q9'] : []),
   ];
   merges.forEach(m => ws.mergeCells(m));
 
@@ -158,7 +178,7 @@ export const buildBook3Workbook = async (opts: Book3ExportOptions) => {
 
   // Khối tiêu đề bảng (dòng 6-10)
   for (let r = 6; r <= 10; r++) {
-    for (let c = 1; c <= 16; c++) {
+    for (let c = 1; c <= lastCol; c++) {
       const cell = ws.getCell(r, c);
       cell.font = { name: FONT, size: 11, bold: true, italic: r === 10 };
       cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
@@ -169,20 +189,20 @@ export const buildBook3Workbook = async (opts: Book3ExportOptions) => {
   // Dữ liệu + dòng TỔNG
   for (let r = 11; r <= totalRow; r++) {
     const isTotal = r === totalRow;
-    for (let c = 1; c <= 16; c++) {
+    for (let c = 1; c <= lastCol; c++) {
       const cell = ws.getCell(r, c);
       cell.border = BORDER;
       cell.font = { name: FONT, size: 12, bold: isTotal };
       if (c === 3 && !isTotal) cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
       else if (c <= 2) cell.alignment = { horizontal: 'center', vertical: 'middle' };
       else cell.alignment = { horizontal: 'right', vertical: 'middle' };
-      if (c >= 4) cell.numFmt = MONEY_FMT;
+      if (c >= 4) cell.numFmt = c === 17 ? '#,##0;[Red]-#,##0;"Khớp"' : MONEY_FMT;
     }
     ws.getRow(r).height = 23.25;
   }
   // Dòng TỔNG dùng công thức SUM để sửa tay số liệu thì tổng tự cập nhật
   if (rows.length > 0) {
-    for (let c = 4; c <= 16; c++) {
+    for (let c = 4; c <= lastCol; c++) {
       const col = ws.getColumn(c).letter;
       ws.getCell(totalRow, c).value = {
         formula: `SUM(${col}11:${col}${lastDataRow})`,
@@ -194,12 +214,12 @@ export const buildBook3Workbook = async (opts: Book3ExportOptions) => {
   const heights: Record<number, number> = { 1: 22, 2: 22, 3: 8, 4: 26, 5: 8, 6: 42, 7: 28.5, 8: 20, 9: 20, 10: 20 };
   Object.entries(heights).forEach(([r, h]) => { ws.getRow(Number(r)).height = h; });
 
-  [5, 11, 40, 9, 9, 9, 16, 15, 16, 9, 14, 9, 15, 15, 14, 14].forEach((w, i) => {
+  [5, 11, 40, 9, 9, 9, 16, 15, 16, 9, 14, 9, 15, 15, 14, 14, 15].slice(0, lastCol).forEach((w, i) => {
     ws.getColumn(i + 1).width = w;
   });
 
   // Vùng in: gồm cả dòng TỔNG
-  ws.pageSetup.printArea = `A1:P${totalRow}`;
+  ws.pageSetup.printArea = `A1:${lastLetter}${totalRow}`;
   return wb;
 };
 

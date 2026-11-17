@@ -7,6 +7,7 @@ import React, { useState, useRef } from 'react';
 import { AgencySettings, D11aRow } from '../types/index.ts';
 import { exportBackupJSON, clearAllStoredData } from '../utils/storage.ts';
 import { CatalogEntry } from '../data/catalog.ts';
+import { UncRow } from '../types/unc.ts';
 import { 
   X, 
   Settings, 
@@ -29,7 +30,9 @@ interface SettingsModalProps {
   lastSync: string;
   onClose: () => void;
   onSaveSettings: (settings: AgencySettings) => void;
-  onRestoreData: (records: D11aRow[], settings?: AgencySettings, catalog?: CatalogEntry[]) => void;
+  onRestoreData: (records: D11aRow[], settings?: AgencySettings, catalog?: CatalogEntry[], unc?: UncRow[]) => void;
+  /** Ủy nhiệm chi (UNC) hiện có — được đưa vào file sao lưu. */
+  unc?: UncRow[];
   /** Danh mục đơn vị hiện hành — được đưa vào file sao lưu. */
   catalog?: CatalogEntry[];
   onClearData: () => void;
@@ -45,6 +48,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSaveSettings,
   onRestoreData,
   catalog = [],
+  unc = [],
   onClearData
 }) => {
   const [formData, setFormData] = useState<AgencySettings>({ ...settings });
@@ -61,7 +65,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleBackup = () => {
-    exportBackupJSON(records, formData, catalog);
+    exportBackupJSON(records, formData, catalog, unc);
   };
 
   const handleRestoreFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +80,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           onRestoreData(
             json.records,
             json.settings,
-            Array.isArray(json.catalog) ? json.catalog : undefined
+            Array.isArray(json.catalog) ? json.catalog : undefined,
+            Array.isArray(json.unc) ? json.unc : undefined
           );
           alert(
             `Khôi phục thành công ${json.records.length} bản ghi` +

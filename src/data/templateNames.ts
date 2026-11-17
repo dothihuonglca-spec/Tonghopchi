@@ -104,3 +104,13 @@ export const d11aPeriodLine = (month: number, year: number): string => {
 /** "Tháng 09 năm 2026" cho sheet D11A_HT. */
 export const d11aHtPeriodLine = (month: number, year: number): string =>
   `Tháng ${String(month).padStart(2, '0')} năm ${year}`;
+
+/** Biểu mẫu UNC (Ủy nhiệm chi) — tên cột chép nguyên văn từ file của đơn vị. */
+export const UNC = {
+  sheet: 'UNC',
+  title: 'ỦY NHIỆM CHI',
+  header: [
+    'STT', 'Ngày', 'Ngày phiếu', 'Số phiếu', 'Mã NC',
+    'Quý', 'Mã đơn vị', 'Tên đơn vị', 'Tiền VND', 'Nội dung',
+  ],
+} as const;

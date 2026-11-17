@@ -59,7 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'upload' as SidebarMenuItem,
       label: 'Tải file lên',
       icon: UploadCloud,
-      description: 'Nạp sheet D11A & D11A_HT'
+      description: 'Nạp D11A, D11A_HT và UNC'
     },
     {
       id: 'months' as SidebarMenuItem,
